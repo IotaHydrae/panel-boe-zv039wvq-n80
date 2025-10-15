@@ -1,0 +1,53 @@
+ /*
+ * Device Tree overlay for BOE ZV039WVQ-N80 3.97" MIPI DSI panel
+ *
+ */
+
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "brcm,bcm2835";
+
+	fragment@0 {
+		target = <&gpio>;
+		__overlay__ {
+			panel_pins: panel_pins {
+				brcm,pins = <41>;
+				brcm,function = <1>;
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&dsi1>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "okay";
+
+			port {
+				dsi_out: endpoint {
+					remote-endpoint = <&panel_in>;
+				};
+			};
+
+			dsi_panel: dsi_panel@0 {
+				reg = <0>;
+				compatible = "goldenmorning,t397b5";
+				pinctrl-names = "default";
+				pinctrl-0 = <&panel_pins>;
+				// backlight = <&backlight>;
+				reset-gpio = <&gpio 41 0>;  // CD1_SCL/GPIO41 ACTIVE_HIGH
+				status = "okay";
+
+				port {
+					panel_in: endpoint {
+						data-lanes = <2>;
+						remote-endpoint = <&dsi_out>;
+					};
+				};
+			};
+		};
+	};
+};
